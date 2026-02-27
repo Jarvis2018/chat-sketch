@@ -1,0 +1,33 @@
+{
+  "name": "chat-sketch",
+  "description": "",
+  "version": "0.1.0",
+  "engines": {
+    "sketch": ">=49.0"
+  },
+  "skpm": {
+    "name": "chat-sketch",
+    "manifest": "src/manifest.json",
+    "main": "chat-sketch.sketchplugin",
+    "assets": [
+      "assets/**/*"
+    ],
+    "sketch-assets-file": "sketch-assets/icons.sketch"
+  },
+  "scripts": {
+    "build": "skpm-build",
+    "watch": "skpm-build --watch",
+    "start": "skpm-build --watch --run",
+    "postinstall": "npm run build && skpm-link"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.28.6",
+    "@skpm/builder": "^0.9.5"
+  },
+  "author": "Focus <zzdxys@qq.com>",
+  "dependencies": {
+    "@skpm/fs": "^0.2.6",
+    "sketch-json-helper": "^1.1.1",
+    "sketch-module-web-view": "^3.5.1"
+  }
+}
