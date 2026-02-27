@@ -1,190 +1,112 @@
 # Chat Sketch
 
-> AI-powered Sketch plugin that generates high-fidelity UI designs from natural language descriptions
+一个 Sketch 插件：输入自然语言需求，生成 HTML 预览并转换为 Sketch 画板/图层。
 
-## ✨ Features
+## 功能
 
-- 🤖 **AI-Powered**: Uses Claude CLI to generate HTML designs from text descriptions
-- 🎨 **Live Preview**: Preview generated HTML before converting to Sketch
-- 📱 **Multi-Device**: Supports iOS, Android, and web design patterns
-- 🛡️ **Rock Solid**: Completely stable with proper resource management
-- 🚀 **Full Featured**: Preserves all styles - corners, shadows, gradients, SVGs
-- ⚡ **Fast Iteration**: Generate multiple design variations quickly
+- 自然语言生成界面（通过 Claude CLI）
+- 预览 HTML 后再执行转换
+- 支持大页面批量转换（`async-batch`，降低 Sketch 崩溃概率）
+- 支持常见样式：文本、圆角、边框、渐变、阴影、SVG 图标等
 
-## 🎉 Crash Issue Fixed!
+## 当前实现能力
 
-**Status**: ✅ Fully resolved - tested and confirmed stable
+- 从自然语言生成页面 HTML，并在面板中预览
+- 将预览结果转换为 Sketch 画板与图层
+- 对复杂页面启用批处理转换，优先保证稳定性
+- 支持一次生成一次转换的工作流（单轮）
 
-The plugin previously had crash issues with complex designs. This has been **completely fixed** through proper resource management:
+## 当前限制
 
-- ✅ No more crashes on complex designs
-- ✅ No more crashes on second/third conversions
-- ✅ All styles preserved (corners, shadows, gradients, SVGs)
-- ✅ Supports any complexity level
+- 暂未实现“基准还原”级别的像素一致性  
+  HTML 渲染模型与 Sketch 图层模型存在差异，复杂布局/矢量路径仍可能出现偏差。
 
-**Technical solution**: Enhanced garbage collection + proper delays + batch processing cleanup
+- 暂未实现“对话式修改已生成画板”  
+  当前流程是重新生成并再次转换，不能直接在已生成画板上按对话进行增量编辑。
 
-📖 **Read more**: [Final Solution](./FINAL_SOLUTION.md)
+## 环境要求
 
-## 📦 Installation
+- macOS + Sketch
+- Node.js 18+
+- [Claude CLI](https://claude.ai/download)（需在 PATH 中可用）
 
-1. [Download](../../releases/latest/download/chat-sketch.sketchplugin.zip) the latest release
-2. Unzip the file
-3. Double-click `chat-sketch.sketchplugin` to install
-4. Make sure [Claude CLI](https://claude.ai/download) is installed and available in your PATH
+## 安装与启动（开发模式）
 
-## 🎯 Quick Start
+当前插件面板默认加载 `http://localhost:3000`，所以需要先启动前端开发服务。
 
-1. Open Sketch and run the plugin (Plugins → Chat Sketch)
-2. Describe your design in natural language:
-   ```
-   Create a login page with:
-   - Title "Welcome Back"
-   - Username input field
-   - Password input field
-   - Blue login button with rounded corners
-   - "Forgot password?" link at bottom
-   ```
-3. Click "Generate" to preview the HTML
-4. Click "Convert to Sketch" to create the design
-5. Done! All styles are preserved (corners, shadows, etc.)
-
-## ⚠️ Complexity Warnings
-
-For very complex designs (200+ elements), you may see a warning:
-
-```
-⚠️ 设计较复杂：
-• 预计生成 350 个图层，较多但会尝试转换
-• 转换可能需要较长时间
-
-是否继续？
-```
-
-This is just a heads-up, not an error. Click "OK" to continue - the conversion will work fine, just may take a few seconds longer.
-
-## 📚 Documentation
-
-- [Final Solution](./FINAL_SOLUTION.md) - Complete fix for crash issues ✅
-- [Crash Fix Documentation](./CRASH_FIX.md) - Technical details about stability fixes
-- [Testing Guide](./TESTING_GUIDE.md) - How to test the plugin
-- [Quick Reference](./QUICK_REFERENCE.md) - Quick reference for developers
-
-### Legacy Documentation (No Longer Needed)
-
-These were created during troubleshooting but are no longer necessary:
-- [Safe Mode Guide](./SAFE_MODE_GUIDE.md) - Safe mode is available but not needed
-- [Complexity Limits](./COMPLEXITY_LIMITS.md) - Limits are now much more relaxed
-- [Solution Summary](./SOLUTION_SUMMARY.md) - Superseded by Final Solution
-
-## 🔧 Advanced Configuration
-
-### Safe Mode (Optional)
-
-Safe mode is available but **not needed** anymore. The crash issue has been fixed through proper resource management.
-
-If you still want to use safe mode (minimal styling), edit `src/handler.js`:
-
-```javascript
-const USE_SAFE_MODE = true  // Change to true
-```
-
-Then rebuild:
-```bash
-npm run build
-```
-
-Safe mode creates basic layouts without styling, which you then complete manually in Sketch.
-
-## 🛠️ Development
-
-## Installation
-
-- [Download](../../releases/latest/download/chat-sketch.sketchplugin.zip) the latest release of the plugin
-- Un-zip
-- Double-click on chat-sketch.sketchplugin
-
-## Development Guide
-
-_This plugin was created using `skpm`. For a detailed explanation on how things work, checkout the [skpm Readme](https://github.com/skpm/skpm/blob/master/README.md)._
-
-### Usage
-
-Install the dependencies
+1. 安装依赖
 
 ```bash
 npm install
+cd web-panel && npm install
 ```
 
-Once the installation is done, you can run some commands inside the project folder:
+2. 启动面板开发服务
 
 ```bash
+cd web-panel
+npm run dev
+```
+
+3. 回到插件目录构建并链接
+
+```bash
+cd ..
 npm run build
+npx skpm-link
 ```
 
-To watch for changes:
+4. 在 Sketch 中打开
+
+- `Plugins -> Custom Plugin -> Reload Plugins`
+- `Plugins -> Chat Sketch -> Open Panel`
+- 快捷键：`Ctrl + Shift + C`
+
+## 使用流程
+
+1. 输入页面需求（中文/英文都可以）
+2. 点击生成，查看 HTML 预览
+3. 点击“转换为 Sketch”
+4. 插件在当前页面创建画板和图层
+
+## 常用命令
 
 ```bash
+# 构建插件
+npm run build
+
+# 监听构建
 npm run watch
-```
 
-Additionally, if you wish to run the plugin every time it is built:
-
-```bash
+# 构建并自动运行插件
 npm run start
 ```
 
-### Custom Configuration
+## 项目结构
 
-#### Babel
-
-To customize Babel, you have two options:
-
-- You may create a [`.babelrc`](https://babeljs.io/docs/usage/babelrc) file in your project's root directory. Any settings you define here will overwrite matching config-keys within skpm preset. For example, if you pass a "presets" object, it will replace & reset all Babel presets that skpm defaults to.
-
-- If you'd like to modify or add to the existing Babel config, you must use a `webpack.skpm.config.js` file. Visit the [Webpack](#webpack) section for more info.
-
-#### Webpack
-
-To customize webpack create `webpack.skpm.config.js` file which exports function that will change webpack's config.
-
-```js
-/**
- * Function that mutates original webpack config.
- * Supports asynchronous changes when promise is returned.
- *
- * @param {object} config - original webpack config.
- * @param {boolean} isPluginCommand - whether the config is for a plugin command or a resource
- **/
-module.exports = function(config, isPluginCommand) {
-  /** you can change config here **/
-}
+```text
+chat-sketch/
+├── src/                 # Sketch 插件逻辑（handler + 转换核心）
+├── web-panel/           # Vue + Vite 面板
+├── assets/              # 插件图标等资源
+└── chat-sketch.sketchplugin/  # 构建产物
 ```
 
-### Debugging
+## 常见问题
 
-To view the output of your `console.log`, you have a few different options:
+- 点击插件没反应  
+  通常是 `web-panel` 的 dev server 未启动，请先运行 `cd web-panel && npm run dev`。
 
-- Use the [`sketch-dev-tools`](https://github.com/skpm/sketch-dev-tools)
-- Run `skpm log` in your Terminal, with the optional `-f` argument (`skpm log -f`) which causes `skpm log` to not stop when the end of logs is reached, but rather to wait for additional data to be appended to the input
+- 转换复杂页面较慢  
+  批处理模式会分批创建图层以提升稳定性，复杂页面耗时会增加。
 
-### Publishing your plugin
+## 未来规划
 
-```bash
-skpm publish <bump>
-```
+- 提升 HTML -> Sketch 的保真度，逐步接近基准还原
+- 增强矢量路径、复杂布局、字体与间距的一致性
+- 支持对已生成画板进行对话式增量修改（局部更新而非整页重建）
+- 增加可回放/可追踪的设计迭代历史
 
-(where `bump` can be `patch`, `minor` or `major`)
+## License
 
-`skpm publish` will create a new release on your GitHub repository and create an appcast file in order for Sketch users to be notified of the update.
-
-You will need to specify a `repository` in the `package.json`:
-
-```diff
-...
-+ "repository" : {
-+   "type": "git",
-+   "url": "git+https://github.com/ORG/NAME.git"
-+  }
-...
-```
+[MIT](./LICENSE)
