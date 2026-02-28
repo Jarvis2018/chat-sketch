@@ -4,7 +4,7 @@
 
 ## 功能
 
-- 自然语言生成界面（通过 Claude CLI）
+- 自然语言生成界面（通过 Claude Code）
 - 预览 HTML 后再执行转换
 - 支持大页面批量转换（`async-batch`，降低 Sketch 崩溃概率）
 - 支持常见样式：文本、圆角、边框、渐变、阴影、SVG 图标等
@@ -28,7 +28,7 @@
 
 - macOS + Sketch
 - Node.js 18+
-- [Claude CLI](https://claude.ai/download)（需在 PATH 中可用）
+- [Claude Code](https://claude.com/product/claude-code)（需在 PATH 中可用）
 
 ## 安装与启动（开发模式）
 
