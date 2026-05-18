@@ -243,29 +243,51 @@ function parseDesignSpec(output) {
  */
 function buildHTMLSystemPrompt(deviceType, artboardWidth) {
   const deviceGuidelines = {
-    ios: 'iOS design patterns with SF Pro font family',
-    android: 'Material Design guidelines with Roboto font family',
-    web: 'flexible responsive layouts with system fonts'
+    ios:
+      'iOS-style mobile screen: use -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif; safe-area padding; 44px minimum tap targets',
+    android:
+      'Material-style mobile: use Roboto or system-ui; 48dp touch targets where appropriate; elevation-like shadows',
+    web: 'Clean responsive layout within the artboard width; system-ui font stack'
   }
-  
+
   const guideline = deviceGuidelines[deviceType] || deviceGuidelines.ios
-  
-  return `You are a UI design expert that generates HTML code for mobile and web interfaces.
 
-Target Device: ${deviceType}
-Artboard Width: ${artboardWidth}px
+  return `You are a senior product designer and front-end engineer. Generate a single, production-polished screen as HTML.
 
-Requirements:
-- Generate complete HTML with inline CSS styles
-- Use semantic HTML5 elements
-- Include all styles inline (no external CSS files)
-- Use web-safe fonts or system fonts (Arial, Helvetica, sans-serif)
-- Follow ${guideline}
-- Ensure responsive layout within ${artboardWidth}px width
-- No JavaScript or external dependencies
-- Use flexbox or CSS grid for layouts
-- Include proper spacing and padding
-- Use appropriate colors and typography`
+Target device: ${deviceType}
+Artboard width: ${artboardWidth}px (root container max-width: ${artboardWidth}px; centered on wider viewports)
+
+Output rules:
+- Return ONE complete HTML document only (DOCTYPE, html, head, body). No markdown, no commentary.
+- All CSS must be in a <style> block in <head> (no external CSS, no JS, no images from URLs).
+- Semantic HTML5 (main, section, header, form, label, button, a).
+- ${guideline}
+
+Visual quality (must follow):
+- 8px spacing grid: consistent vertical rhythm (e.g. 24–32px between major sections, 12–16px between label and field, 20–24px between form groups).
+- Typography scale: clear hierarchy — page title ~22–26px / font-weight 600–700; subtitle ~14–15px / color #6B7280 or similar; field labels ~12–13px / medium weight / muted; body ~15–16px.
+- Color: neutrals for chrome (#F3F4F6 or #F9FAFB field backgrounds, #E5E7EB borders, #111827 primary text); one restrained brand accent (solid or linear-gradient) for primary CTA and small highlights; links use accent, not random bright blues.
+- Inputs: min-height 44–48px; border-radius 10–12px; subtle filled background OR 1px border with stronger focus state (outline or ring: 2px accent + 2px offset, border-color change). Placeholder color ~#9CA3AF.
+- Buttons: primary full-width CTA with linear-gradient or solid brand color, white label, font-weight 600, border-radius 12px, layered soft shadow (e.g. box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(brand,.25)); secondary/outline buttons must still look intentional (visible border or soft tint, not washed out).
+- Dividers: 1px line with optional centered label using pseudo-elements or flex; muted text #9CA3AF.
+- Icons: simple inline SVG (minimal paths) where helpful; circular social buttons ~48px with subtle border or shadow.
+- Do not use harsh single-layer drop shadows; prefer soft, layered shadows.
+
+Auth / login screens (when the user asks for login, OTP, 验证码, phone, etc.):
+- Structure: logo/mark → title → subtitle → form → primary action → legal line → third-party section.
+- Top branding: keep gap between logo and title small (12–16px); use larger gaps (24–32px) before the form block so hierarchy reads clearly.
+- Phone row: optional +86 prefix in a tinted pill; single cohesive field.
+- OTP row: flex with flex:1 code input + separate "获取验证码" button that looks like a secondary button (visible hierarchy, not pale/disabled-looking unless styled as disabled).
+- Legal line: small 12px gray text with <a> for 用户协议 / 隐私政策.
+
+Micro-interaction: subtle :active (scale 0.98 or darken filter) on primary/secondary buttons; transition 0.15–0.2s ease on shadows and colors.
+
+Accessibility:
+- Visible focus styles on inputs and buttons; sufficient text contrast.
+
+Technical:
+- <meta charset="utf-8"> and viewport meta in head.
+- Body margin 0; optional subtle page background (#F9FAFB) with white card for form is encouraged for depth.`
 }
 
 /**

@@ -44,7 +44,6 @@ export default function (context) {
     identifier: 'chat-sketch.open-panel',
     width: 800,
     height: 700,
-    show: false,
     title: 'Chat Sketch',
     resizable: true,
     alwaysOnTop: true,
@@ -55,6 +54,16 @@ export default function (context) {
 
   var browserWindow = new BrowserWindow(options)
   var webContents = browserWindow.webContents
+
+  webContents.on('did-fail-load', function () {
+    if (__CHAT_SKETCH_USE_LOCAL_PANEL__) {
+      sketch.UI.message(
+        'Chat Sketch：无法连接 Vite（http://localhost:3000）。请先在本项目执行 npm run dev 并保持终端运行。'
+      )
+    } else {
+      sketch.UI.message('Chat Sketch：面板文件加载失败，请确认已执行 npm run build 并重新安装插件。')
+    }
+  })
 
   // Listen for HTML generation requests
   webContents.on('generate-html', function(params) {
@@ -113,13 +122,32 @@ export default function (context) {
     return { status: 'ok' }
   })
 
-  // Only show the window when it's ready to show
-  browserWindow.once('ready-to-show', function() {
-    browserWindow.show()
-  })
+  if (__CHAT_SKETCH_USE_LOCAL_PANEL__) {
+    browserWindow.loadURL('http://localhost:3000')
+  } else {
+    loadPanelHtml(browserWindow, context)
+  }
+}
 
-  // Load from local dev server (Vite)
-  browserWindow.loadURL('http://localhost:3000')
+function loadPanelHtml(browserWindow, context) {
+  var rel = 'dist/index.html'
+  var fileUrl = null
+  if (typeof __command !== 'undefined' && __command.pluginBundle && __command.pluginBundle()) {
+    var bundleUrl = __command.pluginBundle().urlForResourceNamed(rel)
+    if (bundleUrl) {
+      fileUrl = 'file://' + bundleUrl.path()
+    }
+  }
+  if (!fileUrl && context && context.scriptURL) {
+    var scriptPath = String(context.scriptURL.path())
+    var prefix = scriptPath.replace(/\/Sketch\/[^/]+$/, '/Resources/')
+    fileUrl = 'file://' + prefix + rel
+  }
+  if (fileUrl) {
+    browserWindow.loadURL(fileUrl)
+    return
+  }
+  browserWindow.loadURL(rel)
 }
 
 function handleGenerateHTML(params, context) {

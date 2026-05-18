@@ -10,19 +10,24 @@
     "manifest": "src/manifest.json",
     "main": "chat-sketch.sketchplugin",
     "assets": [
-      "assets/**/*"
+      "assets/**/*",
+      "web-panel/dist/**/*"
     ],
     "sketch-assets-file": "sketch-assets/icons.sketch"
   },
   "scripts": {
-    "build": "skpm-build",
+    "build": "npm run build:web-panel && skpm-build",
+    "build:web-panel": "npm run build --prefix web-panel",
     "watch": "skpm-build --watch",
     "start": "skpm-build --watch --run",
+    "sketch:link": "skpm-link",
+    "dev:web-panel": "npm run dev --prefix web-panel",
     "postinstall": "npm run build && skpm-link"
   },
   "devDependencies": {
     "@babel/runtime": "^7.28.6",
-    "@skpm/builder": "^0.9.5"
+    "@skpm/builder": "^0.9.5",
+    "cross-env": "^7.0.3"
   },
   "author": "Focus <zzdxys@qq.com>",
   "dependencies": {
